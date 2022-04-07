@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ExoPlayerDemo</string>
+    <string name="hello_message">Hello ExoPlayer</string>
 </resources>
