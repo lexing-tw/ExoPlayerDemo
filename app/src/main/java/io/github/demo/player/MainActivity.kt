@@ -1,41 +1,30 @@
 package io.github.demo.player
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
-import androidx.media3.common.MediaItem
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.demo.player.databinding.ActivityMainBinding
+import kotlinx.coroutines.flow.collectLatest
 
+@AndroidEntryPoint
 @OptIn(UnstableApi::class)
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private var exoPlayer: ExoPlayer? = null
+    private val playerViewModel: PlayerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        exoPlayer = ExoPlayer.Builder(this).build().apply {
-            playWhenReady = true
+        lifecycleScope.launchWhenCreated {
+            playerViewModel.uiStateFlow.collectLatest {
+                binding.playerView.player = it.player
+            }
         }
-        binding.playerView.player = exoPlayer
-        playSample()
-    }
-
-    private fun playSample() {
-        val sampleVideo =
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-        val mediaItem = MediaItem.fromUri(sampleVideo)
-        exoPlayer?.setMediaItem(mediaItem)
-        exoPlayer?.prepare()
-    }
-
-    override fun onDestroy() {
-        exoPlayer?.release()
-        exoPlayer = null
-        super.onDestroy()
     }
 }
