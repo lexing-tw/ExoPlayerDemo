@@ -10,7 +10,8 @@
         android:id="@+id/player_view"
         android:layout_width="480dp"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:player_layout_id="@layout/custom_player_view" />
 
     <TextView
         android:layout_width="wrap_content"
