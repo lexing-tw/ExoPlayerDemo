@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">ExoPlayerDemo</string>
-    <string name="hello_message">Hello ExoPlayer</string>
+    <string name="hello_message">Custom surface demo</string>
 </resources>
