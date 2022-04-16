@@ -1,9 +1,11 @@
 package io.github.demo.player
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -16,7 +18,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PlayerViewModel @Inject constructor(@ApplicationContext context: Context): ViewModel() {
+class PlayerViewModel @Inject constructor(@ApplicationContext context: Context) : ViewModel(),
+    Player.Listener {
     private val exoPlayer: ExoPlayer by lazy { ExoPlayer.Builder(context).build() }
 
     private val _uiStateFlow: MutableStateFlow<UiState>
@@ -25,6 +28,7 @@ class PlayerViewModel @Inject constructor(@ApplicationContext context: Context):
 
     init {
         exoPlayer.playWhenReady = true
+        exoPlayer.addListener(this)
         setMedia(mediaItems)
     }
 
@@ -42,6 +46,11 @@ class PlayerViewModel @Inject constructor(@ApplicationContext context: Context):
         updateState(UiState(exoPlayer, CurrentState(mediaUrl = "")))
     }
 
+    override fun onPlaybackStateChanged(playbackState: Int) {
+        Log.i("TAG", "play state $playbackState")
+        super.onPlaybackStateChanged(playbackState)
+    }
+
     private fun updateState(state: UiState) {
         viewModelScope.launch {
             _uiStateFlow.emit(state)
@@ -49,6 +58,7 @@ class PlayerViewModel @Inject constructor(@ApplicationContext context: Context):
     }
 
     override fun onCleared() {
+        exoPlayer.removeListener(this)
         exoPlayer.release()
         super.onCleared()
     }
